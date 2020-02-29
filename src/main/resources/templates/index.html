@@ -134,10 +134,52 @@
         height: 88%;
         margin: 0 auto;
     }
+
+    .loading{width:100%; height: 100%;position: fixed;top:0;left: 0;z-index: 100;background: #ffffff;}
+    .loading .pic{
+        width: 64px;
+        height: 64px;
+        /* background: url(images/loading.gif); */
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left:0;
+        right:0;
+        margin: auto}
+
+    .loading .pic i{
+        display: block;
+        float: left;
+        width: 6px;
+        height: 50px;
+        background: #399;
+        margin: 0 2px;
+        transform: scaleY(0.4);
+        animation: load 1.2s infinite;
+    }
+    .loading .pic i:nth-child(1){animation-delay:0.1s }
+    .loading .pic i:nth-child(2){animation-delay:0.2s }
+    .loading .pic i:nth-child(3){animation-delay:0.3s }
+    .loading .pic i:nth-child(4){animation-delay: 0.4s}
+    .loading .pic i:nth-child(5){animation-delay:0.5s }
+
+    @keyframes load{
+        0%,40%,100%{transform: scaleY(0.4)}
+        20%{transform:scaleY(1) }
+    }
 </style>
 <body style="display: block; margin: 0 auto;">
+<div class="loading">
+    <div class="pic">
+        <i></i>
+        <i></i>
+        <i></i>
+        <i></i>
+        <i></i>
+    </div>
+</div>
 <div class="btn-audio" id="img3">
-    <audio id="mp3Btn">
+    <audio id="mp3Btn" preload="load" >
         <source src="bgm.mp3" type="audio/mpeg"/>
     </audio>
 </div>
@@ -162,7 +204,7 @@
                 <tr><td colspan="2"></td></tr>
                 <tr><td colspan="2"></td></tr>
                 <tr>
-                    <td style="font-size: 20px;color: red;float: right;"><strong>承若人：</strong></td>
+                    <td style="font-size: 20px;color: red;float: right;"><strong>承诺人：</strong></td>
                     <td><input type="text" id="username" style="float:left;outline-style: none;border: 1px solid #ccc;border-radius: 6px;height: 30px;font-size: 22px;width: 180px"></td>
                 </tr>
                 <tr style="margin-top: 25px">
@@ -170,7 +212,7 @@
                     <td>
                         <select id="dep" style="float:left;outline-style: none;border: 1px solid #ccc;border-radius: 6px;height: 30px;font-size: 22px;width: 180px">
                             <option value ="请选择"></option>
-                            <option value ="产领导">产领导</option>
+                            <option value ="厂领导">厂领导</option>
                             <option value ="办公室">办公室</option>
                             <option value="企业管理室">企业管理室</option>
                             <option value="财务室">财务室</option>
@@ -209,6 +251,12 @@
 </div>
 </body>
 <script type="text/javascript">
+    document.onreadystatechange=function(){
+        console.log(document.readyState);
+        if(document.readyState=="complete"){
+            $(".loading").fadeOut();
+        }
+    }
     document.querySelector('#share').addEventListener('click', function () {
         Mshare.popup(config);
     });
@@ -230,82 +278,7 @@
             console.log(1);
         }
     };
-    // document.querySelector('#share').addEventListener('click', function () {
-    //     Mshare.popup(config);
-    // });
     Mshare.init(config);
-    var imgUrl = 'http://bluablua.com/yc.jpg';
-    var lineLink = 'http://bluablua.com';
-    var descContent = '大力抗疫情 大理复考厂————大理复烤厂在行动';
-    var shareTitle = '疫情防控 复工复产';
-    var appId = 'wxba1ced49dd332847';
-
-
-    $.ajax({
-        type: 'GET',
-        url: '/signature',
-        dataType: 'json',
-        data: {link: window.location.href},
-        success: function (res) {
-            console.log(res)
-            var timestamp = res.timestamp;
-            var nonceStr = res.noncestr;
-            var signature = res.signature;
-            console.log('appId',appId)
-            console.log('timestamp',timestamp)
-            console.log('nonceStr',nonceStr)
-            console.log('signature',signature)
-            wx.config({
-                debug: false,
-                appId: appId,
-                timestamp: timestamp,
-                nonceStr: nonceStr,
-                signature: signature,
-                jsApiList: [
-                    'onMenuShareTimeline',// 分享到朋友圈接口
-                    'onMenuShareAppMessage'//  分享到朋友接口
-                ]
-            });
-            wx.checkJsApi({
-                jsApiList: [
-                    'onMenuShareTimeline',// 分享到朋友圈接口
-                    'onMenuShareAppMessage'//  分享到朋友接口
-                ], // 需要检测的JS接口列表，所有JS接口列表见附录2,
-                success: function(res) {
-                    // 以键值对的形式返回，可用的api值true，不可用为false
-                    // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
-                }
-            });
-            wx.ready(function() {
-                wx.onMenuShareTimeline({
-                    title: shareTitle, // 分享标题
-                    link: lineLink, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                    imgUrl: imgUrl, // 分享图标
-                    success: function () {
-                        // 用户确认分享后执行的回调函数
-                    },
-                    cancel: function () {
-                        // 用户取消分享后执行的回调函数
-                    }
-                });
-                wx.onMenuShareAppMessage({
-                    title: shareTitle, // 分享标题
-                    desc: descContent, // 分享描述
-                    link: lineLink, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                    imgUrl: imgUrl, // 分享图标
-                    // type: '', // 分享类型,music、video或link，不填默认为link
-                    // dataUrl:'' , // 如果type是music或video，则要提供数据链接，默认为空
-                    success: function () {
-                        // 用户确认分享后执行的回调函数
-
-                    },
-                    cancel: function () {
-                        // 用户取消分享后执行的回调函数
-                    }
-                });
-            });
-        }
-    })
     function submit(){
         var name = $('#username').val();
         var select = document.getElementById("dep");
@@ -319,7 +292,6 @@
             return;
         }
 
-        shareTitle = '我是'+name+",我接力,疫情防控 复工复产!"
         $("#sp_dep").html(dep)
         $("#sp_name").html(name)
         $("#div2").animate({
@@ -328,11 +300,88 @@
         $("#div3").animate({
             top: "0%"
         }, 200);
+        var imgUrl = 'http://bluablua.com/yc.jpg';
+        var lineLink = 'http://bluablua.com';
+        var descContent = '大力抗疫情 大理复烤厂————大理复烤厂在行动';
+        var shareTitle = '我是'+name+",我接力,疫情防控 复工复产!"
+        var appId = 'wxba1ced49dd332847';
+
+
+        $.ajax({
+            type: 'GET',
+            url: '/signature',
+            dataType: 'json',
+            data: {link: window.location.href},
+            success: function (res) {
+                console.log(res)
+                var timestamp = res.timestamp;
+                var nonceStr = res.noncestr;
+                var signature = res.signature;
+                console.log('appId',appId)
+                console.log('timestamp',timestamp)
+                console.log('nonceStr',nonceStr)
+                console.log('signature',signature)
+                wx.config({
+                    debug: false,
+                    appId: appId,
+                    timestamp: timestamp,
+                    nonceStr: nonceStr,
+                    signature: signature,
+                    jsApiList: [
+                        'onMenuShareTimeline',// 分享到朋友圈接口
+                        'onMenuShareAppMessage'//  分享到朋友接口
+                    ]
+                });
+                wx.checkJsApi({
+                    jsApiList: [
+                        'onMenuShareTimeline',// 分享到朋友圈接口
+                        'onMenuShareAppMessage'//  分享到朋友接口
+                    ], // 需要检测的JS接口列表，所有JS接口列表见附录2,
+                    success: function(res) {
+                        // 以键值对的形式返回，可用的api值true，不可用为false
+                        // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+                    }
+                });
+                wx.ready(function() {
+                    wx.onMenuShareTimeline({
+                        title: shareTitle, // 分享标题
+                        link: lineLink, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                        imgUrl: imgUrl, // 分享图标
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                    });
+                    wx.onMenuShareAppMessage({
+                        title: shareTitle, // 分享标题
+                        desc: descContent, // 分享描述
+                        link: lineLink, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                        imgUrl: imgUrl, // 分享图标
+                        // type: '', // 分享类型,music、video或link，不填默认为link
+                        // dataUrl:'' , // 如果type是music或video，则要提供数据链接，默认为空
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                    });
+                });
+            }
+        })
     }
     $(document).ready(function(){
-        var audio = document.getElementById('mp3Btn');
-        audio.volume = .3;
-        audio.play()
+        // var audio = document.getElementById('mp3Btn');
+        // audio.volume = .3;
+        // audio.play()
+        document.addEventListener("WeixinJSBridgeReady", function () {
+            var audio = document.getElementById('mp3Btn');
+            audio.volume = .3;
+            audio.play()
+        }, false);
         var angle = 0;
         var dt = setInterval(function(){
             angle+=3;
